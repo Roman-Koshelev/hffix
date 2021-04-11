@@ -2255,23 +2255,17 @@ private:
     friend class message_reader_const_iterator;
 
     void init() {
+        char const* b = buffer_; 
 
-        // Skip the version prefix string "8=FIX.4.2" or "8=FIXT.1.1", et cetera.
-        char const* b = buffer_ + 9; // look for the first '\x01'
+        if (b >= buffer_end_) return;
+        if (*b++ != '8') return invalid();
+        if (b >= buffer_end_) return;
+        if (*b++ != '=') return invalid();
 
-        while(true) {
-            if (b >= buffer_end_) return;
-
-            if (*b == '\x01') {
-                prefix_end_ = b;
-                break;
-            }
-            if (b - buffer_ > 11) {
-                invalid();
-                return;
-            }
-            ++b;
-        }
+        // look for the first '\x01'
+        b = (const char*)memchr(b, '\x01', buffer_end_ - b);
+        if (b == nullptr) return;
+        prefix_end_ = b;
 
         if (b + 1 >= buffer_end_) return;
 
