@@ -2277,17 +2277,17 @@ private:
 
         while(true) {
             if (b >= buffer_end_) return;
-
-            if (*b == '\x01') break;
-            if (*b < '0' || *b > '9') { // this is the only time we need to check for numeric ascii.
+            char tmp = *b++;
+ 
+            if (tmp == '\x01') break;
+            if (tmp < '0' || tmp > '9') { // this is the only time we need to check for numeric ascii.
                 invalid();
                 return;
             }
             bodylength *= 10;
-            bodylength += *b++ - '0'; // we know that 0 <= (*b - '0') <= 9, so rvalue will be positive.
+            bodylength += tmp - '0'; // we know that 0 <= (*b - '0') <= 9, so rvalue will be positive.
         }
 
-        ++b;
         if (b + 3 >= buffer_end_) return;
 
         if (*b != '3' || b[1] != '5') { // next field must be tag 35 MsgType
