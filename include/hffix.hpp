@@ -2260,10 +2260,8 @@ private:
         char const* b = buffer_ + 9; // look for the first '\x01'
 
         while(true) {
-            if (b >= buffer_end_) {
-                is_complete_ = false;
-                return;
-            }
+            if (b >= buffer_end_) return;
+
             if (*b == '\x01') {
                 prefix_end_ = b;
                 break;
@@ -2275,10 +2273,8 @@ private:
             ++b;
         }
 
-        if (b + 1 >= buffer_end_) {
-            is_complete_ = false;
-            return;
-        }
+        if (b + 1 >= buffer_end_) return;
+
         if (b[1] != '9') { // next field must be tag 9 BodyLength
             invalid();
             return;
@@ -2288,10 +2284,8 @@ private:
         size_t bodylength(0); // the value of tag 9 BodyLength
 
         while(true) {
-            if (b >= buffer_end_) {
-                is_complete_ = false;
-                return;
-            }
+            if (b >= buffer_end_) return;
+
             if (*b == '\x01') break;
             if (*b < '0' || *b > '9') { // this is the only time we need to check for numeric ascii.
                 invalid();
@@ -2302,10 +2296,7 @@ private:
         }
 
         ++b;
-        if (b + 3 >= buffer_end_) {
-            is_complete_ = false;
-            return;
-        }
+        if (b + 3 >= buffer_end_) return;
 
         if (*b != '3' || b[1] != '5') { // next field must be tag 35 MsgType
             invalid();
@@ -2314,10 +2305,7 @@ private:
 
         char const* checksum = b + bodylength;
 
-        if (checksum + 7 > buffer_end_) {
-            is_complete_ = false;
-            return;
-        }
+        if (checksum + 7 > buffer_end_) return;
 
         if (*(checksum - 1) != '\x01') { // check for SOH before the checksum.
                                          // this guarantees that at least
