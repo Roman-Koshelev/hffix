@@ -2265,15 +2265,13 @@ private:
         // look for the first '\x01'
         b = (const char*)memchr(b, '\x01', buffer_end_ - b);
         if (b == nullptr) return;
-        prefix_end_ = b;
+        prefix_end_ = b++;
 
-        if (b + 1 >= buffer_end_) return;
-
-        if (b[1] != '9') { // next field must be tag 9 BodyLength
-            invalid();
-            return;
-        }
-        b += 3; // skip the " 9=" for tag 9 BodyLength
+        if (b >= buffer_end_) return;
+        // next field must be tag 9 BodyLength
+        if (*b++ != '9') return invalid();
+        if (b >= buffer_end_) return;
+        if (*b++ != '=') return invalid();
 
         size_t bodylength(0); // the value of tag 9 BodyLength
 
